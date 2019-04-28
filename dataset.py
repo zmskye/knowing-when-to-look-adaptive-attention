@@ -6,7 +6,8 @@ from torch.utils.data import Dataset
 import torch.optim
 import torch.utils.data
 
-#A PyTorch Dataset class to be used in a PyTorch DataLoader to create mini-batches.
+
+# A PyTorch Dataset class to be used in a PyTorch DataLoader to create mini-batches.
 class CaptionDataset(Dataset):
 
     def __init__(self, split, transform=None):
@@ -26,11 +27,12 @@ class CaptionDataset(Dataset):
         self.transform = transform
         # Total number of datapoints
         self.dataset_size = len(self.captions)
-        
+
     def __getitem__(self, i):
         # i is the caption. To get it's corresponding image, we do the following:
         # The Nth caption corresponds to the (N // captions_per_image)th image
-        img = torch.FloatTensor(self.imgs[i // self.cpi] / 255.)  #Manually create the torch tensor rather than transforms.ToTensor()
+        img = torch.FloatTensor(
+            self.imgs[i // self.cpi] / 255.)  # Manually create the torch tensor rather than transforms.ToTensor()
         if self.transform is not None:
             img = self.transform(img)
         caption = torch.LongTensor(self.captions[i])
@@ -38,10 +40,11 @@ class CaptionDataset(Dataset):
         if self.split is 'TRAIN':
             return img, caption, caplen
         else:
-            #For validation of testing, also return all 'captions_per_image' captions to find BLEU-4 score
-            #Example: Returning all the captions for caption 17 -->  
-            #[(17//5)*5   :  (17//5)*5  +  5] --> [15:20]--> all captions of image 3
-            all_captions = torch.LongTensor(self.captions[((i // self.cpi) * self.cpi):(((i // self.cpi) * self.cpi) + self.cpi)])
+            # For validation of testing, also return all 'captions_per_image' captions to find BLEU-4 score
+            # Example: Returning all the captions for caption 17 -->
+            # [(17//5)*5   :  (17//5)*5  +  5] --> [15:20]--> all captions of image 3
+            all_captions = torch.LongTensor(
+                self.captions[((i // self.cpi) * self.cpi):(((i // self.cpi) * self.cpi) + self.cpi)])
             return img, caption, caplen, all_captions
 
     def __len__(self):
